@@ -15,8 +15,8 @@ async def start_web_app():
     import uvicorn
     config = uvicorn.Config(
         app,
-        host="127.0.0.1",  # или 0.0.0.0 для общедоступного доступа
-        port=8443,
+        host="0.0.0.0",  # или 0.0.0.0 для общедоступного доступа
+        port=1000,
         log_level="info"
     )
     server = uvicorn.Server(config)
