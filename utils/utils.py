@@ -27,3 +27,12 @@ async def random_questions_F_funck(callback, tag_id):
     
     question_message = await callback.message.answer(question.question_text)
     session.close()
+
+
+def convert_google_drive_link_preview(link):
+    if "drive.google.com/file/d/" in link:
+        file_id = link.split("file/d/")[1].split("/view")[0]
+        preview_link = f"https://drive.google.com/file/d/{file_id}/preview"
+        return preview_link
+    else:
+        return "Неправильный формат ссылки Google Drive"
