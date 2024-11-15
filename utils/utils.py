@@ -36,3 +36,4 @@ def convert_google_drive_link_preview(link):
         return preview_link
     else:
         return "Неправильный формат ссылки Google Drive"
+convert_google_drive_link_preview(link="    ")

@@ -1,52 +1,141 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastAPI Chat Room</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <script>
-        console.log("1")
+    <title>Video Room with Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+        }
 
+        .video-container {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+        }
 
+        .video-container video {
+            max-width: 100%;
+            max-height: 100%;
+        }
 
-        // static/chat.js
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-left: 2px solid #ccc;
+            background-color: #f9f9f9;
+        }
 
-            // Получаем ID комнаты из URL
-            const roomId = window.location.pathname.split("/").pop();
-            const ws = new WebSocket(`ws://${window.location.host}/ws/rooms/${roomId}`);
+        .chat-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background-color: #fff;
+            border-bottom: 1px solid #ccc;
+        }
 
-            // Обработка входящих сообщений
-            ws.onmessage = function (event) {
-                const messageContainer = document.getElementById("message-container");
-                const message = document.createElement("div");
-                message.textContent = event.data;
-                messageContainer.appendChild(message);
-                messageContainer.scrollTop = messageContainer.scrollHeight; // Прокручиваем вниз
-            };
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background-color: #f1f1f1;
+        }
 
-            // Отправка сообщений
-            function sendMessage() {
-                const input = document.getElementById("messageInput");
-                if (input.value) {
-                    ws.send(input.value);
-                    input.value = '';
-                }
-            }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
 
-    </script>
+        .chat-input button {
+            margin-left: 10px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .chat-input button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="chat-container">
-        <h2>Чат Комнаты</h2>
-        <div id="message-container"></div>
-        <input type="text" id="messageInput" placeholder="Введите сообщение" autofocus />
-        <button onclick="sendMessage()">Отправить</button>
+    <div class="video-container">
+        <video id="room-video" controls autoplay>
+            <source id="video-source" src="" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
     </div>
-    <script src="web/static/chat.js"></script>
+    <div class="chat-container">
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="chat-input" placeholder="Type your message here...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const idRoom = "{{ id_room }}"; // Room ID passed from FastAPI
+
+            // Example video source based on room ID (replace with your logic)
+            const videoSource = `/videos/room_${idRoom}.mp4`;
+            document.getElementById("video-source").src = videoSource;
+            document.getElementById("room-video").load();
+
+            // Chat functionality
+            const chatMessages = document.getElementById("chat-messages");
+            const chatInput = document.getElementById("chat-input");
+            const sendButton = document.getElementById("send-button");
+
+            const appendMessage = (message) => {
+                const msgDiv = document.createElement("div");
+                msgDiv.textContent = message;
+                chatMessages.appendChild(msgDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            };
+
+            // Simulated WebSocket connection (replace with real implementation)
+            const fakeSocket = {
+                send: (message) => {
+                    setTimeout(() => appendMessage(`User: ${message}`), 500);
+                },
+                onmessage: (callback) => {
+                    setInterval(() => callback(`Server: Ping at ${new Date().toLocaleTimeString()}`), 5000);
+                },
+            };
+
+            sendButton.addEventListener("click", () => {
+                const message = chatInput.value.trim();
+                if (message) {
+                    fakeSocket.send(message);
+                    appendMessage(`You: ${message}`);
+                    chatInput.value = "";
+                }
+            });
+
+            chatInput.addEventListener("keypress", (e) => {
+                if (e.key === "Enter") {
+                    sendButton.click();
+                }
+            });
+
+            fakeSocket.onmessage((message) => appendMessage(message));
+        });
+    </script>
 </body>
 
 </html>
