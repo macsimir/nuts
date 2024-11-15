@@ -13,12 +13,11 @@ async def random_questions_F_funck(callback: types.CallbackQuery):
     session = Session() 
     user_id = callback.message.chat.id
     user = get_user_by_telegram_id(telegram_id=user_id, session=session)
-    telegram_id = callback.message.chat.id 
+    telegram_id = callback.message.chat.id
+    
+
     user = session.query(User).filter_by(telegram_id=telegram_id).first()
-    if user is None:
-        new_user = User(telegram_id=telegram_id, privilege="User")
-        session.add(new_user)
-        session.commit()
+
     if callback.message.chat.type == "private":
         keyboard = await get_invite_button(bot)  # Передаем bot как аргумент
         await callback.message.answer("Нажмите кнопку ниже, чтобы добавить бота в группу как администратора:", reply_markup=keyboard)
@@ -29,6 +28,9 @@ async def random_questions_F_funck(callback: types.CallbackQuery):
                 reply_markup=Tag_key()
             )
         else:
+            new_user = User(telegram_id=telegram_id, privilege="User")
+            session.add(new_user)
+            session.commit()
             create_new_user(session=session, telegram_id=user_id)
             await callback.message.answer(
                 "Привет, о чем сегодня хотите поговорить?",

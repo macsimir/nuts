@@ -1,5 +1,25 @@
 from aiogram import types
 
+def view_video(id):
+    buttons = [
+        [types.InlineKeyboardButton(text="Просмотр Видео", url=f"https://nuts-g6i3.onrender.com/rooms/{id}"),],
+    ]
+    keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
+    return keyboard
+
+
+
+def menu_keyboard():
+    buttons = [
+        [types.InlineKeyboardButton(text="Случайные вопросы", callback_data="random_questions_F_key")],
+        [types.InlineKeyboardButton(text="Просмотр Видео", callback_data="video_to_menu"),],
+        [types.InlineKeyboardButton(text="Вопросы на знания друг друга", callback_data="about_F_key")],
+    ]
+    keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
+    return keyboard
+
+
+
 def chanel_keyboard_status():
     buttons = [
         [types.InlineKeyboardButton(text="Подписаться", url="https://t.me/macsimomg")],

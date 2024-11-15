@@ -1,22 +1,27 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from utils.utils import convert_google_drive_link_preview
-import uvicorn
+from starlette.websockets import WebSocketState
+from typing import List, Dict
+from utils.utils import convert_google_drive_link_preview  # Проверьте, что этот файл и функция существуют
 
-# Создаем экземпляр FastAPI
 app = FastAPI()
+
+# Подключаем папку static для работы с CSS и JS
+app.mount("/static", StaticFiles(directory="web/static"), name="static")
 
 # Настраиваем Jinja2 для шаблонов
 templates = Jinja2Templates(directory="web/templates")
 
-# Маршрут для отображения HTML
+
+# Маршрут для главной страницы
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
-@app.get("/room", response_class=HTMLResponse)
-async def room(request: Request):
-    input_link = "https://drive.google.com/file/d/1f3ssRcCOhpYWbjMfBYInAJcpylrxHENo/view?usp=sharing"
-    converted_link = convert_google_drive_link_preview(input_link)
-    return templates.TemplateResponse("users_chat.html", {"request": request, "url":converted_link})
+# Маршрут для чата с указанием комнаты
+@app.get("/rooms/{id_room}", response_class=HTMLResponse)
+async def get_chat_room(request: Request, id_room: int):
+    return templates.TemplateResponse("index.html", {"request": request, "id_room": id_room})
+

@@ -6,7 +6,7 @@ from utils.config import dp, bot
 logging.basicConfig(level=logging.INFO)
 
 async def start_bot():
-    from handlers.users import start, random_question  # импортируем все обработчики
+    from handlers.users import start, random_question,view_video # импортируем все обработчики
     from handlers.admin import admin_panel
     await dp.start_polling(bot)
 
