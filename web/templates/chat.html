@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+</head>
+
+<body>
+    <h1>Simple Chat</h1>
+    <div id="chat-box"></div>
+    <form id="chat-form">
+        <input type="text" id="message-input" placeholder="Type your message" required>
+        <button type="submit">Send</button>
+    </form>
+    <script>
+        async function fetchMessages() {
+            const response = await fetch('/api/messages');
+            const messages = await response.json();
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = messages.map(msg => `<p>${msg.text}</p>`).join('');
+        }
+
+        async function sendMessage(event) {
+            event.preventDefault();
+            const input = document.getElementById('message-input');
+            await fetch('/api/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: input.value })
+            });
+            input.value = '';
+            fetchMessages();
+        }
+
+        document.getElementById('chat-form').addEventListener('submit', sendMessage);
+        fetchMessages();
+    </script>
+</body>
+
+</html>

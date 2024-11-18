@@ -11,12 +11,12 @@ async def start_bot():
     await dp.start_polling(bot)
 
 async def start_web_app():
-    from web.app import app
+    from web.main import app
     import uvicorn
     config = uvicorn.Config(
         app,
         host="0.0.0.0",  # или 0.0.0.0 для общедоступного доступа
-        port=1000,
+        port=9000,
         log_level="info"
     )
     server = uvicorn.Server(config)
