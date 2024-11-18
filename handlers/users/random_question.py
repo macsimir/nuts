@@ -36,6 +36,7 @@ async def random_questions_F_funck(callback: types.CallbackQuery):
                 "Привет, о чем сегодня хотите поговорить?",
                 reply_markup=Tag_key()
             )
+    # await callback.message.answer("Текст")
 
 
 

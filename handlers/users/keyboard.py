@@ -2,7 +2,7 @@ from aiogram import types
 
 def view_video(id):
     buttons = [
-        [types.InlineKeyboardButton(text="Просмотр Видео", url=f"https://nuts-g6i3.onrender.com/rooms/{id}"),],
+        [types.InlineKeyboardButton(text="Просмотр Видео", url=f"https://nuts-g6i3.onrender.com/message"),],
     ]
     keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard
@@ -30,6 +30,7 @@ def chanel_keyboard_status():
 
 
 def random_questions_F_key():
+    
     buttons = [
         [types.InlineKeyboardButton(text="Подобрная инструкция", callback_data="help_F_key"),types.InlineKeyboardButton(text="Информация", callback_data="about_F_key")],
         [types.InlineKeyboardButton(text="Запустить", callback_data="random_questions_F_key")],

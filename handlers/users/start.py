@@ -21,7 +21,7 @@ async def start_command(message: types.Message):
         await message.answer("Нажмите кнопку ниже, чтобы добавить бота в группу как администратора:", reply_markup=keyboard)
     
     elif message.chat.type == 'group' or message.chat.type == 'supergroup':
-        await message.answer(user_startup_text, reply_markup=random_questions_F_key())
+        # await message.answer(user_startup_text, reply_markup=random_questions_F_key())
 
         await message.answer("Теперь я в группе! Вот меню:", reply_markup=menu_keyboard())
 
@@ -84,3 +84,6 @@ async def video_to_menu_command(callback: types.CallbackQuery):
     await callback.answer()
 
 
+@dp.callback_query(F.data == "about_F_key")
+async def about_F_key_command(callback: types.CallbackQuery):
+    await callback.message.answer("Пока что этой функции нету")
