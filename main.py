@@ -13,15 +13,17 @@ async def start_bot():
 async def start_web_app():
     from web.main import app
     import uvicorn
+    import os
+
+    port = int(os.getenv("PORT", 8000))  # Используем порт из окружения или 8000 по умолчанию
     config = uvicorn.Config(
         app,
-        host="0.0.0.0",  # или 0.0.0.0 для общедоступного доступа
-        port=10000,
+        host="0.0.0.0",  # Открываем для внешнего доступа
+        port=port,
         log_level="info"
     )
     server = uvicorn.Server(config)
     await server.serve()
-
 async def main():
     # Создаем задачи для бота и веб-приложения
     bot_task = asyncio.create_task(start_bot())

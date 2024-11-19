@@ -73,3 +73,4 @@ async def websocket_endpoint(websocket: WebSocket, db: Session = Depends(get_db)
                 await manager.broadcast(data)
     except WebSocketDisconnect:
         manager.disconnect(websocket)
+
