@@ -185,6 +185,25 @@
                 input.value = '';
             }
         });
+        const ws = new WebSocket(`wss://${window.location.host}/ws`);
+
+            ws.onopen = () => {
+                console.log("WebSocket connection established.");
+            };
+
+            ws.onmessage = (event) => {
+                console.log("Message received:", event.data);
+            };
+
+            ws.onerror = (error) => {
+                console.error("WebSocket error:", error);
+                // Возможно, имеет смысл повторно попытаться установить соединение
+            };
+
+            ws.onclose = (event) => {
+                console.warn("WebSocket connection closed:", event);
+                // Убедитесь, что дальнейшие вызовы к `ws` не происходят
+            };
 
         // События для синхронизации видео
         video.addEventListener("play", () => {
