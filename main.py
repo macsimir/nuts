@@ -15,7 +15,7 @@ async def start_web_app():
     import uvicorn
     import os
 
-    port = int(os.getenv("PORT", 10000))  # Используем порт из окружения или 8000 по умолчанию
+    port = int(os.getenv("PORT", 8000))  # Используем порт из окружения или 8000 по умолчанию
     config = uvicorn.Config(
         app,
         host="0.0.0.0",  # Открываем для внешнего доступа
