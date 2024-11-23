@@ -115,7 +115,7 @@
         <button type="submit">Send</button>
     </form>
     <script>
-        const ws = new WebSocket("wss://nuts-g6i3.onrender.com:8000/ws");
+        const ws = new WebSocket("https://nuts-g6i3.onrender.com:8000/ws");
         // const ws = new WebSocket(`wss://${window.location.host}/ws`);
         
 
@@ -185,26 +185,7 @@
                 input.value = '';
             }
         });
-        const ws = new WebSocket(`wss://${window.location.host}/ws`);
-
-            ws.onopen = () => {
-                console.log("WebSocket connection established.");
-            };
-
-            ws.onmessage = (event) => {
-                console.log("Message received:", event.data);
-            };
-
-            ws.onerror = (error) => {
-                console.error("WebSocket error:", error);
-                // Возможно, имеет смысл повторно попытаться установить соединение
-            };
-
-            ws.onclose = (event) => {
-                console.warn("WebSocket connection closed:", event);
-                // Убедитесь, что дальнейшие вызовы к `ws` не происходят
-            };
-
+        
         // События для синхронизации видео
         video.addEventListener("play", () => {
             ws.send(JSON.stringify({ type: "video", action: "play", currentTime: video.currentTime }));
