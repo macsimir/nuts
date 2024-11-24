@@ -1,6 +1,9 @@
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
 from fastapi.websockets import WebSocketDisconnect
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, Request
 
 app = FastAPI()
 
@@ -22,52 +25,11 @@ class ConnectionManager:
 
 
 manager = ConnectionManager()
+templates = Jinja2Templates(directory="test/templates")
 
 @app.get("/")
-async def get():
-    html_content = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>WebSocket Client</title>
-    </head>
-    <body>
-        <h1>WebSocket Client</h1>
-        <input type="text" id="messageInput" placeholder="Введите сообщение" />
-        <button onclick="sendMessage()">Отправить</button>
-        <div id="messages"></div>
-
-        <script>
-            const ws = new WebSocket('wss://nuts-g6i3.onrender.com/ws'); // или подходящий путь для WebSocket
-
-            ws.onopen = () => {
-                console.log("Соединение установлено");
-            };
-
-            ws.onmessage = (event) => {
-                const messagesDiv = document.getElementById("messages");
-                const messageElement = document.createElement("p");
-                messageElement.textContent = event.data;
-                messagesDiv.appendChild(messageElement);
-            };
-
-            ws.onclose = () => {
-                console.log("Соединение закрыто");
-            };
-
-            function sendMessage() {
-                const input = document.getElementById("messageInput");
-                const message = input.value;
-                ws.send(message);
-                input.value = "";
-            }
-        </script>
-    </body>
-    </html>
-    """
-    return HTMLResponse(content=html_content)
+async def get(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.websocket("/ws")
