@@ -40,7 +40,7 @@ async def get():
         <div id="messages"></div>
 
         <script>
-            const ws = new WebSocket("ws://localhost:9000/ws");
+            const ws = new WebSocket("ws://nuts-g6i3.onrender.com:9000/ws");
 
             ws.onopen = () => {
                 console.log("Соединение установлено");
