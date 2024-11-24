@@ -1,26 +1,13 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, Request
+from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from sqlalchemy.orm import Session
-from web.database import Base, engine, SessionLocal, Message, init_db
-from typing import List
-import json
+from fastapi.websockets import WebSocketDisconnect
 
 app = FastAPI()
 
-# Инициализация базы данных
-init_db()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
+# Хранение подключений
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: List[WebSocket] = []
+        self.active_connections = []
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
@@ -29,52 +16,67 @@ class ConnectionManager:
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
 
-    async def broadcast(self, message: str):
+    async def send_message(self, message: str):
         for connection in self.active_connections:
             await connection.send_text(message)
 
+
 manager = ConnectionManager()
-templates = Jinja2Templates(directory="web/templates")
 
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request, db: Session = Depends(get_db)):
-    Messages = db.query(Message).all()
-    messagss = [{"text": message.text} for message in Messages]
-    return templates.TemplateResponse("index.html", {"request": request, "message": messagss})
+@app.get("/")
+async def get():
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>WebSocket Client</title>
+    </head>
+    <body>
+        <h1>WebSocket Client</h1>
+        <input type="text" id="messageInput" placeholder="Введите сообщение" />
+        <button onclick="sendMessage()">Отправить</button>
+        <div id="messages"></div>
 
-@app.get("/rooms/{room_id}", response_class=HTMLResponse)
-async def get_room(request: Request, room_id: int, db: Session = Depends(get_db)):
-    # Получаем сообщения только для указанной комнаты
-    messages = db.query(Message).filter(Message.room_id == room_id).all()
-    message_data = [{"text": message.text} for message in messages]
+        <script>
+            const ws = new WebSocket("ws://localhost:9000/ws");
 
-    return templates.TemplateResponse(
-        "chat_with_video.html",
-        {"request": request, "messages": message_data, "room_id": room_id}
-    )
+            ws.onopen = () => {
+                console.log("Соединение установлено");
+            };
+
+            ws.onmessage = (event) => {
+                const messagesDiv = document.getElementById("messages");
+                const messageElement = document.createElement("p");
+                messageElement.textContent = event.data;
+                messagesDiv.appendChild(messageElement);
+            };
+
+            ws.onclose = () => {
+                console.log("Соединение закрыто");
+            };
+
+            function sendMessage() {
+                const input = document.getElementById("messageInput");
+                const message = input.value;
+                ws.send(message);
+                input.value = "";
+            }
+        </script>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content)
 
 
-@app.websocket("/ws/{room_id}")
-async def websocket_endpoint(websocket: WebSocket, room_id: int, db: Session = Depends(get_db)):
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            parsed_data = json.loads(data)
-
-            if parsed_data['type'] == 'chat':
-                # Сохраняем сообщение в базу данных с привязкой к room_id
-                new_message = Message(text=f"{parsed_data['name']}: {parsed_data['text']}", room_id=room_id)
-                db.add(new_message)
-                db.commit()
-
-                # Отправляем сообщение всем клиентам комнаты
-                await manager.broadcast(json.dumps({
-                    "type": "chat",
-                    "room_id": room_id,
-                    "text": new_message.text
-                }))
-            elif parsed_data['type'] == 'video':
-                await manager.broadcast(data)
+            await manager.send_message(f"Вы сказали: {data}")
     except WebSocketDisconnect:
         manager.disconnect(websocket)
+        print("Клиент отключился")

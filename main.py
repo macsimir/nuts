@@ -11,7 +11,8 @@ async def start_bot():
     await dp.start_polling(bot)
 
 async def start_web_app():
-    from web.main import app
+    from tests.main import app
+    # from web.main import app
     import uvicorn
     import os
 
