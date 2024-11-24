@@ -8,7 +8,7 @@ app = FastAPI()
 # Разрешаем CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Укажите допустимые домены
+    allow_origins=["https://nuts-g6i3.onrender.com/"],  # Укажите допустимые домены
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
