@@ -1,16 +1,12 @@
-from fastapi import FastAPI, WebSocket
-from fastapi.responses import HTMLResponse
-from fastapi.websockets import WebSocketDisconnect
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, Request
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from typing import List
 
 app = FastAPI()
 
-# Хранение подключений
+# Хранилище для подключения клиентов
 class ConnectionManager:
     def __init__(self):
-        self.active_connections = []
+        self.active_connections: List[WebSocket] = []
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
@@ -19,18 +15,15 @@ class ConnectionManager:
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
 
-    async def send_message(self, message: str):
+    async def send_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message: str):
         for connection in self.active_connections:
             await connection.send_text(message)
 
 
 manager = ConnectionManager()
-templates = Jinja2Templates(directory="test/templates")
-
-@app.get("/")
-async def get(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -38,7 +31,6 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
-            await manager.send_message(f"Вы сказали: {data}")
+            await manager.broadcast(f"Message: {data}")
     except WebSocketDisconnect:
         manager.disconnect(websocket)
-        print("Клиент отключился")
