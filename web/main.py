@@ -5,8 +5,17 @@ from sqlalchemy.orm import Session
 from web.database import Base, engine, SessionLocal, Message, init_db
 from typing import List
 import json
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://nuts-g6i3.onrender.com/"],  # Укажите допустимые домены
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Инициализация базы данных
 init_db()

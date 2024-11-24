@@ -11,14 +11,14 @@ async def start_bot():
     await dp.start_polling(bot)
 
 async def start_web_app():
-    from tests.main import app
+    from tests.main import app  
     # from web.main import app
     import uvicorn
     logging.info("Starting FastAPI server...")
     config = uvicorn.Config(
         app,
         host="0.0.0.0",
-        port=9000,
+        port=8000,
         log_level="info"
     )
     server = uvicorn.Server(config)
