@@ -115,8 +115,8 @@
         <button type="submit">Send</button>
     </form>
     <script>
-        const ws = new WebSocket("wss://nuts-g6i3.onrender.com:443/ws");
-        // const ws = new WebSocket(`wss://${window.location.host}/ws`);
+        // const ws = new WebSocket("wss://nuts-g6i3.onrender.com:443/ws");
+        const ws = new WebSocket(`wss://${window.location.host}/ws`);
         
 
         const chatBox = document.getElementById('chat-box');
