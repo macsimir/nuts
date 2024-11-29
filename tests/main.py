@@ -39,8 +39,7 @@ manager = ConnectionManager()
 @app.get("/")
 async def get():
     """Обслуживание HTML-страницы."""
-    return HTMLResponse("test/templates/index.html", status_code=200)
-
+    return TemplateResponse("index.html", {"request": request, "message": messagss})
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
