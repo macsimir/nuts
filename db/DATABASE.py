@@ -1,39 +1,29 @@
-from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey, Boolean, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey, Boolean
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
-from datetime import datetime  
-import random
-import os
-
-DATABASE_URL = "sqlite:///DATEBASE.db"
-
-# Общие настройки базы данных
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+import random 
 Base = declarative_base()
 
-# Модели
-class Message(Base):
-    __tablename__ = "messages"
-
-    id = Column(Integer, primary_key=True, index=True)
-    text = Column(String, nullable=False)
 
 class User(Base):
     __tablename__ = 'users'
     user_id = Column(Integer, primary_key=True)
-    telegram_id = Column(Integer, unique=True, nullable=False)
-    privilege = Column(String, default="user")
+    telegram_id = Column(Integer)
+    privilege = Column(String)
+
+    @classmethod
+    def telegram_id_exists(cls, session, telegram_id):
+        return session.query(cls).filter(cls.telegram_id == telegram_id).first() is not None
 
 class UserTag(Base):
     __tablename__ = 'user_tags'
     telegram_id_user = Column(Integer, ForeignKey('users.telegram_id'), primary_key=True)
-    tag_id = Column(Integer, ForeignKey('tags.tag_id'), primary_key=True)
+    tag_id = Column(Integer, ForeignKey('tag.tag_id'), primary_key=True)
 
 class Question(Base):
     __tablename__ = 'questions'
     question_id = Column(Integer, primary_key=True, autoincrement=True)
-    question_text = Column(Text, nullable=False)
-    tag_question = Column(Integer, ForeignKey("tags.tag_id"))
+    question_text = Column(Text)
+    tag_question = Column(Integer, ForeignKey("tag.tag_id"))
     tag = relationship("Tag")
 
 class UserQuestion(Base):
@@ -43,24 +33,15 @@ class UserQuestion(Base):
     asked = Column(Boolean, default=False)
 
 class Tag(Base):
-    __tablename__ = "tags"
+    __tablename__ = "tag"
     tag_id = Column(Integer, primary_key=True, autoincrement=True)
-    tag_text = Column(Text, nullable=False)
+    tag_text = Column(Text)
 
-# Инициализация базы данных
-def init_db():
-    Base.metadata.create_all(bind=engine)
+engine = create_engine('sqlite:///DATEBASE.db')
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
 
-# Утилиты
-def get_db():
-    db = Session()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-def get_random_question_by_tag(session):    
+def get_random_question_by_tag(session):
     tag_id = 1
     questions = session.query(Question).filter(Question.tag_question == tag_id).all()
     if not questions:

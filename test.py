@@ -5,14 +5,13 @@ from utils.config import dp, bot
 logging.basicConfig(level=logging.INFO)
 
 async def start_bot():
-    from handlers.users import start, random_question, view_video
+    from handlers.users import start, random_question, q_to
     from handlers.admin import admin_panel
     logging.info("Starting Telegram bot...")
     await dp.start_polling(bot)
 
 async def start_web_app():
-    from tests.main import app  
-    # from web.main import app
+    from web.main import app
     import uvicorn
     logging.info("Starting FastAPI server...")
     config = uvicorn.Config(

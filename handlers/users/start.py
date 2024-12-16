@@ -10,19 +10,14 @@ from handlers.users.keyboard import random_question_button,get_invite_button , T
 
 @dp.message(Command("start"))
 async def start_command(message: types.Message):
+    keyboard = await get_invite_button(bot)
     if message.chat.type == "private":
         user_channel_status = await bot.get_chat_member(chat_id='@macsimomg', user_id=message.from_user.id)
         if user_channel_status.status != 'left':
-            await message.answer(user_startup_text, reply_markup=random_questions_F_key())
+            await message.answer("Привет. Я бот для обещения.Нажмите кнопку ниже, чтобы добавить бота в группу как администратора:", reply_markup=keyboard)
         else:
             await message.answer(user_startup_text_no_sub, reply_markup=chanel_keyboard_status())
-        
-        keyboard = await get_invite_button(bot)  # Убедитесь, что функция возвращает InlineKeyboardMarkup
-        await message.answer("Нажмите кнопку ниже, чтобы добавить бота в группу как администратора:", reply_markup=keyboard)
-    
     elif message.chat.type == 'group' or message.chat.type == 'supergroup':
-        # await message.answer(user_startup_text, reply_markup=random_questions_F_key())
-
         await message.answer("Теперь я в группе! Вот меню:", reply_markup=menu_keyboard())
 
 
@@ -66,13 +61,7 @@ async def about_F_key_command(callback: types.CallbackQuery):
     await callback.message.answer(about_text, reply_markup=back_about_and_contact_f_key())
     await callback.answer()
 
-@dp.message(Command("test"))
-async def start_command(message: types.Message):
-    telegram_id = message.chat.id
-    telegram_id = str(telegram_id)
-    telegram_id = telegram_id[1:]
 
-    await message.answer(f"Тест {telegram_id}")
 
 @dp.callback_query(F.data == "video_to_menu")
 async def video_to_menu_command(callback: types.CallbackQuery):
@@ -87,3 +76,12 @@ async def video_to_menu_command(callback: types.CallbackQuery):
 @dp.callback_query(F.data == "about_F_key")
 async def about_F_key_command(callback: types.CallbackQuery):
     await callback.message.answer("Пока что этой функции нету")
+
+
+from aiogram.types.input_file import BufferedInputFile
+@dp.message(Command("send_gif"))
+async def send_gif(message: types.Message):
+    with open("startbackground.gif", "rb") as file:
+        gif_file = BufferedInputFile(file.read(), filename="example.gif")
+        caption = "This is a GIF!"
+        await bot.send_animation(chat_id=message.chat.id, animation=gif_file, caption=caption)

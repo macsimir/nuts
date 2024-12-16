@@ -13,14 +13,14 @@ def menu_keyboard():
     buttons = [
         [types.InlineKeyboardButton(text="Случайные вопросы", callback_data="random_questions_F_key")],
         [types.InlineKeyboardButton(text="Просмотр Видео", callback_data="video_to_menu"),],
-        [types.InlineKeyboardButton(text="Вопросы на знания друг друга", callback_data="about_F_key")],
+        [types.InlineKeyboardButton(text="Вопросы на знания друг друга", callback_data="questions_about_knowing")],
     ]
     keyboard = types.InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard
 
 
-
 def chanel_keyboard_status():
+
     buttons = [
         [types.InlineKeyboardButton(text="Подписаться", url="https://t.me/macsimomg")],
         [types.InlineKeyboardButton(text="Проверка подписки", callback_data="new_start")]
