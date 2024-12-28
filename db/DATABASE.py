@@ -77,8 +77,10 @@ def create_tag(session):
     tags_list = [
         "Философия",
         "Жизнь",
-        "Отношения",
+        "Отношения_1",
         "Отдых и досуг",
+        "Отношения_2",
+        "Отношения_3",
     ]
     for tag_text in tags_list:
         tag = Tag(tag_text=tag_text)

@@ -2,7 +2,7 @@ from aiogram import types, F
 from aiogram.filters import Command
 from utils.config import dp,bot
 from db.DATABASE import User, Question, UserQuestion, Session, Tag,create_new_user,get_user_by_telegram_id,get_random_question_by_tag, UserTag
-from handlers.users.keyboard import random_question_button,get_invite_button , Tag_key, tag_reply_key
+from handlers.users.keyboard import random_question_button,get_invite_button , Tag_key, tag_reply_key, Relationship_keyboard
 from utils.utils import random_questions_F_funck
 import random
 
@@ -55,8 +55,10 @@ async def callbacks_num(callback: types.CallbackQuery):
         await callback.message.answer("Отдых и досуг")
         await random_questions_F_funck(callback=callback,tag_id=3)
     elif action == "Relationship":
-        await callback.message.answer("Отношения")
-        await random_questions_F_funck(callback=callback,tag_id=4)
+        await callback.message.answer("Выбери степень вопросов:", reply_markup=Relationship_keyboard())
+
+        # await callback.message.answer("Отношения")
+    #     await random_questions_F_funck(callback=callback,tag_id=4)
     await callback.answer()
 
 
