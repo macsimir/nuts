@@ -61,6 +61,24 @@ async def callbacks_num(callback: types.CallbackQuery):
     #     await random_questions_F_funck(callback=callback,tag_id=4)
     await callback.answer()
 
+@dp.callback_query(F.data.startswith("P_"))
+async def callback_perc(callback: types.CallbackQuery):
+    await callback.message.delete()
+    action = callback.data.split("_")[1]
+    if action == "1":
+        await callback.message.answer("1",)
+        await random_questions_F_funck(callback=callback,tag_id=4)
+
+    elif action == "2":
+        await callback.message.answer("2")
+        await random_questions_F_funck(callback=callback,tag_id=5)
+
+    elif action == "3":
+        await random_questions_F_funck(callback=callback,tag_id=6)
+        await callback.message.answer("3")
+    await callback.answer()
+
+
 
 def get_random_question_by_tag(session):
     tag_id = 1

@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 from DATABASE import Tag,Question
+from utils.utils import questions_about_past
 
 Base = declarative_base()
 user_agent = UserAgent()
@@ -50,22 +51,33 @@ class PhilosophyQuestionExtractor:
 
     def _save_questions(self, questions, source=None):
         """Сохранение вопросов в файл и базу данных."""
-        with open("test.txt", "a") as file:
-            for i in questions:
-                question_text = i.text.strip()
+        for i in questions:
+            question_text = i.text.strip()
 
-                # Удаляем номер вопроса, если он есть
-                cleaned_question = re.sub(r'^\d+\.\s*', '', question_text)
-                if source == 5:
-                    # Удаление текста в скобках для второго источника
-                    cleaned_question = re.sub(r'\([^)]*\)', '', cleaned_question).strip()
+            # Удаляем номер вопроса, если он есть
+            cleaned_question = re.sub(r'^\d+\.\s*', '', question_text)
+            if source == 5:
+                # Удаление текста в скобках для второго источника
+                cleaned_question = re.sub(r'\([^)]*\)', '', cleaned_question).strip()
 
-                # Создание объекта Question и добавление в базу данных
-                question = Question(question_text=cleaned_question, tag_question=self.tag.tag_id)
-                self.session.add(question)
-                self.session.commit()
+            # Создание объекта Question и добавление в базу данных
+            question = Question(question_text=cleaned_question, tag_question=self.tag.tag_id)
+            self.session.add(question)
+            self.session.commit()
 
-                print(f"Добавлен вопрос - {cleaned_question}")
+            print(f"Добавлен вопрос - {cleaned_question}")
+
+def fetch_questions_from_source_11(self):
+    """Извлечение вопросов из второго источника."""
+    url = "https://saytpozitiva.ru/filosofskiye-voprosy.html"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    req = requests.get(url, headers=headers)
+    src = req.text
+    soup = BeautifulSoup(src, "lxml")
+    questions = soup.find_all("li")
+
+    self._save_questions(questions[15:-50], source=5)
+
 
 def create_philosophy_questions(session):
     tag = session.query(Tag).filter_by(tag_text="Философия").first()
@@ -73,30 +85,6 @@ def create_philosophy_questions(session):
     extractor.fetch_questions_from_source_4()
     extractor.fetch_questions_from_source_5()
 create_philosophy_questions(session)
-
-
-questions_about_past = [
-    "Какое у тебя самое яркое детское воспоминание?",
-    "Какие традиции вашей семьи были для тебя важны в детстве?",
-    "Какое событие в школе запомнилось тебе больше всего?",
-    "Какие увлечения у тебя были в юности?",
-    "Что ты помнишь о своих первых друзьях?",
-    "Какие уроки ты вынес из своих подростковых лет?",
-    "Какой был твой первый опыт работы?",
-    "Как ты провел свои летние каникулы в детстве?",
-    "Какую роль в твоем воспитании сыграли родители?",
-    "Какой самый запоминающийся праздник ты отмечал в детстве?",
-    "Какие страхи или переживания ты испытывал в молодости?",
-    "Какой совет, полученный в прошлом, ты считаешь особенно важным?",
-    "Что изменилось в твоем восприятии мира с тех пор, как ты был моложе?",
-    "Какое место или город оставили в твоем сердце наилучшие воспоминания?",
-    "Какие книги или фильмы повлияли на твое мировоззрение в молодости?",
-    "Как ты познакомился с первым человеком, который стал важен для тебя?",
-    "Какой навык или хобби ты бы хотел развить в прошлом?",
-    "Какие события или обстоятельства повлияли на твой жизненный путь?",
-    "Как ты справлялся с трудными периодами в своей жизни?",
-    "Какое наследие ты хотел бы оставить своим детям или близким?"
-]
 
 def create_life_q():
     for i in questions_about_past:
